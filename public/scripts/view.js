@@ -51,7 +51,6 @@ $(document).ready(() => {
         addEntry: (name, permission, isDir) => {
             let entry = new Entry(name, permission, isDir);
             let className = entry.name.split('.')[0];            
-            //FIND WAY TO AVOID DOUBLE ADD TO ARRAY!
             display.entries[className] = entry;
             display.entries.push(entry);
             display.content.append(`
@@ -73,7 +72,8 @@ $(document).ready(() => {
         clear: (item_name) => {
             if(item_name){
                 $(`.${item_name}`).remove();
-                display.entries[item_name] = undefined;
+                display.entries[item_name] = null;
+                display.entries.indexOf(item_name)
             }else{
                 $('.file_item_wrapper').remove();
                 display.entries = [];
@@ -81,13 +81,12 @@ $(document).ready(() => {
         },
 
         selectEntry: (item_name) => {
-            console.log('select entry called')
             item_name = item_name.split('.')[0];
             if(!item_name) throw new Error('Missing Argument');
             display.entries.forEach((entry) => {
-                console.log('logging');
+                let className = entry.name.split('.')[0];
                 entry.setSelected(false);
-                $(`.${entry.name}`).removeClass('selected');
+                $(`.${className}`).removeClass('selected');
             });
             display.entries[item_name].setSelected(true);
             $(`.${item_name}`).addClass('selected');
@@ -97,7 +96,7 @@ $(document).ready(() => {
     const app = {};
     app.header = header;
     app.menu = menu;
-    app.menu.init()
+    app.menu.init();
     app.display = display;
 
     window.App = app;
