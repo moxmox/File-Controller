@@ -2,9 +2,8 @@
 $(document).ready(() => {
     
     const header = {
-        infoMsg: $('.infmsg'),
         setMessage: (text) => {
-            this.infoMsg.val = text;
+            $('.infmsg').text(text);
         }
     };
 
@@ -17,7 +16,13 @@ $(document).ready(() => {
         init: () => {
             //initialize events for menu buttons
             menu.moveBtn.on('click', () => {
-                console.log('moveBtn clicked');
+                let selected_item = '';
+                display.entries.forEach((entry) => {
+                    if(entry.isSelected){
+                        selected_item = entry.name;
+                    }
+                    header.setMessage(selected_item);
+                });
             });
             menu.copyBtn.on('click', () => {
                 console.log('copyBtn clicked');
@@ -62,16 +67,17 @@ $(document).ready(() => {
                 </a> 
             </div>
             `);
-            $(`.file_item_wrapper.${className}`)
+            $(`.file_item_wrapper.${utilities.escape(className)}`)
                 .on('click', () => {
                     entry.setSelected(true);
-                    display.selectEntry(className);
+                    console.log('className: '+ className);
+                    display.selectEntry(className);   
                 });
         },
 
         clear: (item_name) => {
             if(item_name){
-                $(`.${item_name}`).remove();
+                $(`.${utilities.escape(item_name)}`).remove();
                 display.entries[item_name] = null;
                 display.entries.indexOf(item_name)
             }else{
@@ -86,18 +92,28 @@ $(document).ready(() => {
             display.entries.forEach((entry) => {
                 let className = entry.name.split('.')[0];
                 entry.setSelected(false);
-                $(`.${className}`).removeClass('selected');
+                $(`.${utilities.escape(className)}`).removeClass('selected');
             });
             display.entries[item_name].setSelected(true);
-            $(`.${item_name}`).addClass('selected');
+            $(`.${utilities.escape(item_name)}`).addClass('selected');
         }
     };
 
-    const app = {};
+    const app = {
+        init: () => {
+            $.get('/home_dir', (data) => {
+                data.forEach(value => {
+                    display.addEntry(value.name, value.mode, value.isDir);
+                });
+            });
+        }
+    };
+
     app.header = header;
     app.menu = menu;
     app.menu.init();
     app.display = display;
+    app.init();
 
     window.App = app;
 
