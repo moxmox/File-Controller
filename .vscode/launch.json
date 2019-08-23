@@ -7,20 +7,21 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "node_debug",
-            "address": "192.168.0.11",
-            "port": 80,
-            "runtimeArgs": [
-                "--debug=5858"
-            ],
+            "name": "Launch Program",
             "program": "${workspaceFolder}/filecon.js",
-            "protocol": "legacy"
+            "args": [
+                "ip",
+                "192.168.0.11",
+                "port",
+                "3000"
+            ]
         },
+
         {
             "type": "chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
-            "url": "http://192.168.0.11:80",
+            "url": "http://12.168.0.11:80",
             "webRoot": "${workspaceFolder}"
         }
     ]

@@ -9,11 +9,10 @@ const stat = util.promisify(fs.stat);
 
 const IO = {};
 
-IO.listAll = async () => {
-    let home_dir = '/home/';
+IO.listAll = async (dir) => {
     let files;
     try{
-        files = await readdir(home_dir, {withFileTypes: true});
+        files = await readdir(dir, {withFileTypes: true});
     }catch(ex){
         console.error(`error: ${ex}`);
     }

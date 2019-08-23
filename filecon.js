@@ -3,12 +3,13 @@
  */
 
 const express = require('express')
-const fs = require('fs')
 const server = require('./modules/server')
 const IO = require('./modules/IO')
+const HOME_DIR = '/home/';
 
 //init server
 if(!server.init(process.argv.slice(2, process.argv.length))){
+    console.error('server not initialized');
     return
 }
 
@@ -23,8 +24,7 @@ app.get('/', (req, res) => {
 
 app.get('/home_dir', (req, res) => {
 
-    IO.listAll().then((result) => {
-        console.log(result);
+    IO.listAll(HOME_DIR).then((result) => {
         return IO.getStats(result, '/home/');
     }).then(value => {
         res.json(value);

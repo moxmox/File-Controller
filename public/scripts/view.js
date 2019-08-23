@@ -10,7 +10,7 @@ $(document).ready(() => {
     const menu = {
         moveBtn: $('.move'),
         copyBtn: $('.copy'),
-        detailsBtn: $('.details'),
+        upBtn: $('.up'),
         deleteBtn: $('.delete'),
         openBtn: $('.open'),
         init: () => {
@@ -27,14 +27,15 @@ $(document).ready(() => {
             menu.copyBtn.on('click', () => {
                 console.log('copyBtn clicked');
             });
-            menu.detailsBtn.on('click', () => {
-                console.log('detailsBtn clicked');
+            menu.upBtn.on('click', () => {
+                console.log('upBtn clicked');
             });
             menu.deleteBtn.on('click', () => {
                 console.log('deleteBtn clicked');
             });
             menu.openBtn.on('click', () => {
                 console.log('openBtn clicked');
+                
             });
         }
     };
@@ -70,7 +71,6 @@ $(document).ready(() => {
             $(`.file_item_wrapper.${utilities.escape(className)}`)
                 .on('click', () => {
                     entry.setSelected(true);
-                    console.log('className: '+ className);
                     display.selectEntry(className);   
                 });
         },
