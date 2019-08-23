@@ -7,8 +7,21 @@ const utilities = {};
 
 utilities.escape = (originalText) => {
     if(originalText.includes('+')){
-        return originalText.replace('+', '\\+');
+        return originalText.replace(/[+]/g, '\\+');
     }else return originalText;
+};
+
+
+/**
+ * will replace all special characters allowing
+ * string to be used as url 
+ */
+utilities.urlify = (url) => {
+    if(url.includes('+')){
+        url = url.replace(/[+]/g, '%2b');
+    }
+
+    return url;
 };
 
 /**

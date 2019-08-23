@@ -32,6 +32,19 @@ app.get('/home_dir', (req, res) => {
 
 });
 
+app.get('/files', (req, res) => {
+
+    let path = `${HOME_DIR}${req.query.dir_path}/`;
+    console.log(`reading dir: ${path}`);
+    IO.listAll(path).then((result) => {
+        return IO.getStats(result, path);
+    }).then(value => {
+        console.log(value);
+        res.json(value);
+    });
+
+});
+
 //start listening
 app.listen(server.port, server.ipaddr, () => {
     console.log(`listening on: \n{\n\taddr: ${server.ipaddr}, \n\tport: ${server.port}\n} \n\n^C to Exit . . .`);

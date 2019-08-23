@@ -34,8 +34,16 @@ $(document).ready(() => {
                 console.log('deleteBtn clicked');
             });
             menu.openBtn.on('click', () => {
-                console.log('openBtn clicked');
-                
+                for(i=0;i<display.entries.length;i++){
+                    if(display.entries[i].isSelected){
+                        if(!display.entries[i].isDir){
+                            window.alert('cannot read contents of file');
+                            return;
+                        }
+                        let dir_path = display.entries[i].name;
+                        app.openDir(dir_path);
+                    }
+                }             
             });
         }
     };
@@ -56,7 +64,12 @@ $(document).ready(() => {
 
         addEntry: (name, permission, isDir) => {
             let entry = new Entry(name, permission, isDir);
-            let className = entry.name.split('.')[0];            
+            let className = '';
+            if(entry.name.startsWith('.')){
+                className = entry.name.split('.')[1];    
+            }else{
+                className = entry.name.split('.')[0];            
+            }
             display.entries[className] = entry;
             display.entries.push(entry);
             display.content.append(`
@@ -90,7 +103,12 @@ $(document).ready(() => {
             item_name = item_name.split('.')[0];
             if(!item_name) throw new Error('Missing Argument');
             display.entries.forEach((entry) => {
-                let className = entry.name.split('.')[0];
+                let className = '';
+                if(entry.name.startsWith('.')){
+                    className = entry.name.split('.')[1];
+                }else{
+                    className = entry.name.split('.')[0];
+                }
                 entry.setSelected(false);
                 $(`.${utilities.escape(className)}`).removeClass('selected');
             });
@@ -100,11 +118,31 @@ $(document).ready(() => {
     };
 
     const app = {
+        cwd: '',
+
         init: () => {
-            $.get('/home_dir', (data) => {
+            $.get(`${utilities.urlify('/home_dir')}`, (data) => {
                 data.forEach(value => {
                     display.addEntry(value.name, value.mode, value.isDir);
                 });
+            });
+        },
+
+        openDir: (path) => { 
+            if(app.cwd===''){
+                path = utilities.urlify(path);
+            }else{
+                path = utilities.urlify(`${app.cwd}/${path}`);
+            }
+            $.get(`/files?dir_path=${path}`, (data) => {
+                app.cwd = path;
+                display.clear();
+                console.log(path);
+                console.log(app.cwd);
+                for(i=0;i<data.length;i++){
+                    value = data[i];
+                    display.addEntry(value.name, value.mode, value.isDir);
+                }
             });
         }
     };
