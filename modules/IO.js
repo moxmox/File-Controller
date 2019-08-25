@@ -40,4 +40,16 @@ IO.getStats = async (entryList, cwd) => {
     return result;
 };
 
+/**
+ * IO.moveFile will move a file,
+ * possibly will include ability 
+ * to move a dir. async function
+ * called in filecon.js by api call
+ * to 'move/'
+ */
+
+IO.moveFile = async () => {
+
+};
+
 module.exports = IO;

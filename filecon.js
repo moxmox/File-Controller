@@ -5,7 +5,7 @@
 const express = require('express')
 const server = require('./modules/server')
 const IO = require('./modules/IO')
-const HOME_DIR = '/home/';
+const HOME_DIR = '/home';
 
 //init server
 if(!server.init(process.argv.slice(2, process.argv.length))){
@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 app.get('/home_dir', (req, res) => {
 
     IO.listAll(HOME_DIR).then((result) => {
-        return IO.getStats(result, '/home/');
+        return IO.getStats(result, HOME_DIR);
     }).then(value => {
         res.json(value);
     });
@@ -35,14 +35,18 @@ app.get('/home_dir', (req, res) => {
 app.get('/files', (req, res) => {
 
     let path = `${HOME_DIR}${req.query.dir_path}/`;
-    console.log(`reading dir: ${path}`);
     IO.listAll(path).then((result) => {
         return IO.getStats(result, path);
     }).then(value => {
-        console.log(value);
         res.json(value);
-    });
+    }).catch(error => {console.log(error)});
 
+});
+
+app.get('/move', (req, res) => {
+    console.log(`file=${req.query.file}, dest=${req.query.dest}`);
+    console.log(`dest: ${req.query.dest}`);
+    res.json({msg: 'grrrrreat!'});
 });
 
 //start listening

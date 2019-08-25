@@ -7,6 +7,12 @@ $(document).ready(() => {
         }
     };
 
+    const ACTION = {
+        MOVE: 'MOVE',
+        COPY: 'COPY',
+        DELETE: 'DELETE'
+    };
+
     const menu = {
         moveBtn: $('.move'),
         copyBtn: $('.copy'),
@@ -16,12 +22,17 @@ $(document).ready(() => {
         init: () => {
             //initialize events for menu buttons
             menu.moveBtn.on('click', () => {
-                let selected_item = '';
+                if(app.action===ACTION.MOVE){
+                    //move the file then return & skip below block
+                    app.moveItem();
+                }
+
                 display.entries.forEach((entry) => {
                     if(entry.isSelected){
-                        selected_item = entry.name;
+                        app.actionItem = entry.name;
+                        app.action = ACTION.MOVE;
                     }
-                    header.setMessage(selected_item);
+                    header.setMessage(`click move again to move ${app.actionItem} to ${app.cwd}`);
                 });
             });
             menu.copyBtn.on('click', () => {
@@ -37,7 +48,7 @@ $(document).ready(() => {
                 for(i=0;i<display.entries.length;i++){
                     if(display.entries[i].isSelected){
                         if(!display.entries[i].isDir){
-                            window.alert('cannot read contents of file');
+                            window.alert(`${display.entries[i].name} is not a directory`);
                             return;
                         }
                         let dir_path = display.entries[i].name;
@@ -114,6 +125,23 @@ $(document).ready(() => {
             });
             display.entries[item_name].setSelected(true);
             $(`.${utilities.escape(item_name)}`).addClass('selected');
+        },
+
+        updateHeader: () => {
+            switch(app.action)
+            {
+                case ACTION.MOVE:
+                    header.setMessage(`click move again to move '${app.actionItem}' to '${app.cwd}'`); 
+                    break;
+                case ACTION.COPY:
+                    header.setMessage.setMessage('copy func not currently operating');
+                    break;
+                case ACTION.DELETE:
+                    header.setMessage('delete func not currently operating');
+                    break;
+                default: 
+                    header.setMessage('Nothing to display');
+            }            
         }
     };
 
@@ -128,17 +156,37 @@ $(document).ready(() => {
             });
         },
 
+        moveItem: () => {
+            let path = utilities.urlify(`/move?file=${app.actionItem}&dest=${app.cwd}`);
+                    $.get(path, (data) => {
+                        console.log(data.msg);
+                        display.clear();
+                        console.log(`cwd: ${app.cwd}`);
+                        /**
+                         * after file is moved,
+                         * update view & state vars
+                         */
+                        app.openDir();
+                        app.action = 'none';
+                        app.actionItem = 'none';
+                        display.updateHeader();
+                    });
+        },
+
         openDir: (path) => { 
             if(app.cwd===''){
-                path = utilities.urlify(path);
+                urlSafePath = utilities.urlify(`/${path}`);
             }else{
-                path = utilities.urlify(`${app.cwd}/${path}`);
+                if(!path){
+                    urlSafePath = utilities.urlify(app.cwd);
+                }else{
+                    urlSafePath = utilities.urlify(`${app.cwd}/${path}`);
+                }
             }
-            $.get(`/files?dir_path=${path}`, (data) => {
-                app.cwd = path;
+            $.get(`/files?dir_path=${urlSafePath}`, (data) => {
+                app.cwd = `${app.cwd}/${path}`;
                 display.clear();
-                console.log(path);
-                console.log(app.cwd);
+                display.updateHeader();
                 for(i=0;i<data.length;i++){
                     value = data[i];
                     display.addEntry(value.name, value.mode, value.isDir);
@@ -147,6 +195,8 @@ $(document).ready(() => {
         }
     };
 
+    app.action = 'none';
+    app.actionItem = 'none';
     app.header = header;
     app.menu = menu;
     app.menu.init();
