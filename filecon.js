@@ -45,8 +45,14 @@ app.get('/files', (req, res) => {
 
 app.get('/move', (req, res) => {
     console.log(`file=${req.query.file}, dest=${req.query.dest}`);
-    console.log(`dest: ${req.query.dest}`);
-    res.json({msg: 'grrrrreat!'});
+    let oldPath = `${HOME_DIR}${req.query.oldPath}${req.query.file}`;
+    let newPath = `${HOME_DIR}${req.query.dest}/${req.query.file}`;
+    IO.moveFile(oldPath, newPath).then(() => {
+        console.log('moveFile result');
+        res.json({code: 'success'});
+    }).catch(error => {
+        console.error(error);
+    });
 });
 
 //start listening

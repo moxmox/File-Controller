@@ -6,6 +6,7 @@ const util = require('util');
 
 const readdir = util.promisify(fs.readdir);
 const stat = util.promisify(fs.stat);
+const rename = util.promisify(fs.rename);
 
 const IO = {};
 
@@ -40,16 +41,8 @@ IO.getStats = async (entryList, cwd) => {
     return result;
 };
 
-/**
- * IO.moveFile will move a file,
- * possibly will include ability 
- * to move a dir. async function
- * called in filecon.js by api call
- * to 'move/'
- */
-
-IO.moveFile = async () => {
-
+IO.moveFile = async (oldPath, newPath) => {
+    return await Promise.resolve(rename(oldPath ,newPath));
 };
 
 module.exports = IO;

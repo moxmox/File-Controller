@@ -23,16 +23,17 @@ $(document).ready(() => {
             //initialize events for menu buttons
             menu.moveBtn.on('click', () => {
                 if(app.action===ACTION.MOVE){
-                    //move the file then return & skip below block
                     app.moveItem();
                 }
 
                 display.entries.forEach((entry) => {
                     if(entry.isSelected){
+                        app.oldPath = app.cwd;
+                        console.log(`oldPath: ${app.oldPath}`);
                         app.actionItem = entry.name;
                         app.action = ACTION.MOVE;
+                        header.setMessage(`click move again to move ${app.actionItem} to ${app.cwd}`);                        
                     }
-                    header.setMessage(`click move again to move ${app.actionItem} to ${app.cwd}`);
                 });
             });
             menu.copyBtn.on('click', () => {
@@ -157,19 +158,19 @@ $(document).ready(() => {
         },
 
         moveItem: () => {
-            let path = utilities.urlify(`/move?file=${app.actionItem}&dest=${app.cwd}`);
+            let path = utilities.urlify(`/move?file=${app.actionItem}&oldPath=${app.oldPath}/&dest=${app.cwd}`);
                     $.get(path, (data) => {
-                        console.log(data.msg);
                         display.clear();
-                        console.log(`cwd: ${app.cwd}`);
-                        /**
-                         * after file is moved,
-                         * update view & state vars
-                         */
                         app.openDir();
+                        console.log(data.code);
+                        if(data.code==='success'){
+                            window.alert(`${app.actionItem} moved succesfully!`);
+                            display.updateHeader();
+                        }else{
+                            header.setMessage('An Error has occurred');
+                        }
                         app.action = 'none';
                         app.actionItem = 'none';
-                        display.updateHeader();
                     });
         },
 
@@ -184,7 +185,9 @@ $(document).ready(() => {
                 }
             }
             $.get(`/files?dir_path=${urlSafePath}`, (data) => {
-                app.cwd = `${app.cwd}/${path}`;
+                if(path){
+                    app.cwd = `${app.cwd}/${path}`;
+                }
                 display.clear();
                 display.updateHeader();
                 for(i=0;i<data.length;i++){
@@ -197,6 +200,7 @@ $(document).ready(() => {
 
     app.action = 'none';
     app.actionItem = 'none';
+    app.oldPath = '';
     app.header = header;
     app.menu = menu;
     app.menu.init();
