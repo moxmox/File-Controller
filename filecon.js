@@ -48,7 +48,17 @@ app.get('/move', (req, res) => {
     let oldPath = `${HOME_DIR}${req.query.oldPath}${req.query.file}`;
     let newPath = `${HOME_DIR}${req.query.dest}/${req.query.file}`;
     IO.moveFile(oldPath, newPath).then(() => {
-        console.log('moveFile result');
+        res.json({code: 'success'});
+    }).catch(error => {
+        console.error(error);
+    });
+});
+
+app.get('/del', (req, res) => {
+    console.log(`path: ${req.query.path}`);
+    console.log(`file: ${req.query.file}`);
+    let absFileName = `${HOME_DIR}${req.query.path}/${req.query.file}`;
+    IO.remFile(absFileName).then(() => {
         res.json({code: 'success'});
     }).catch(error => {
         console.error(error);

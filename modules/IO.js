@@ -7,6 +7,7 @@ const util = require('util');
 const readdir = util.promisify(fs.readdir);
 const stat = util.promisify(fs.stat);
 const rename = util.promisify(fs.rename);
+const unlink = util.promisify(fs.unlink);
 
 const IO = {};
 
@@ -43,6 +44,10 @@ IO.getStats = async (entryList, cwd) => {
 
 IO.moveFile = async (oldPath, newPath) => {
     return await Promise.resolve(rename(oldPath ,newPath));
+};
+
+IO.remFile = async (absoluteName) => {
+    return await Promise.resolve(unlink(absoluteName));
 };
 
 module.exports = IO;

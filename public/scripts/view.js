@@ -19,8 +19,35 @@ $(document).ready(() => {
         upBtn: $('.up'),
         deleteBtn: $('.delete'),
         openBtn: $('.open'),
+        confirmDialog: $('.confirmDialog'),
+        confirmInput: $('.confirmInput'),
+        confirmSubmit: $('.confirmSubmit'),
+        confirmCancel: $('.confirmCancel'),
+
         init: () => {
             //initialize events for menu buttons
+            menu.confirmSubmit.on('click', () => {
+                for(i=0;i<display.entries.length;i++){
+                    if(display.entries[i].isSelected){
+                        app.actionItem = display.entries[i].name;
+                    }
+                }
+                if(app.action===ACTION.DELETE){
+                    if(app.actionItem){
+                        app.removeItem();
+                        menu.confirmDialog.addClass('hidden');
+                    }else{
+                        window.alert('No file selected');
+                    }
+                }else{
+                    window.alert('An unknown error occured');
+                }
+            });
+            menu.confirmCancel.on('click', () => {
+                menu.confirmDialog.addClass('hidden');
+                app.action = 'none';
+                app.actionItem = 'none';
+            });
             menu.moveBtn.on('click', () => {
                 if(app.action===ACTION.MOVE){
                     app.moveItem();
@@ -43,7 +70,8 @@ $(document).ready(() => {
                 console.log('upBtn clicked');
             });
             menu.deleteBtn.on('click', () => {
-                console.log('deleteBtn clicked');
+                app.action = ACTION.DELETE;
+                menu.confirmDialog.removeClass('hidden');
             });
             menu.openBtn.on('click', () => {
                 for(i=0;i<display.entries.length;i++){
@@ -138,7 +166,7 @@ $(document).ready(() => {
                     header.setMessage.setMessage('copy func not currently operating');
                     break;
                 case ACTION.DELETE:
-                    header.setMessage('delete func not currently operating');
+                    header.setMessage(`Delete ${app.actionItem}?`);
                     break;
                 default: 
                     header.setMessage('Nothing to display');
@@ -157,14 +185,32 @@ $(document).ready(() => {
             });
         },
 
+        removeItem: () => {
+            let path = utilities.urlify(`/del?file=${app.actionItem}&path=${app.cwd}`);
+            $.get(path, (data) => {
+                console.log('removeItem function complete');
+                console.log(data.code);
+                display.clear();
+                if(data.code==='success'){
+                    window.alert(`${app.actionItem} removed succesfully!`);
+                    display.updateHeader();
+                }else{
+                    header.setMessage('An Error has occurred');
+                }
+                app.openDir();
+                app.action = 'none';
+                app.actionItem = 'none';
+            });
+        },
+
         moveItem: () => {
             let path = utilities.urlify(`/move?file=${app.actionItem}&oldPath=${app.oldPath}/&dest=${app.cwd}`);
                     $.get(path, (data) => {
                         display.clear();
-                        app.openDir();
                         console.log(data.code);
+                        app.openDir();
                         if(data.code==='success'){
-                            window.alert(`${app.actionItem} moved succesfully!`);
+                            window.alert(`success!`);
                             display.updateHeader();
                         }else{
                             header.setMessage('An Error has occurred');
@@ -195,7 +241,7 @@ $(document).ready(() => {
                     display.addEntry(value.name, value.mode, value.isDir);
                 }
             });
-        }
+        },
     };
 
     app.action = 'none';
