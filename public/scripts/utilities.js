@@ -24,6 +24,13 @@ utilities.urlify = (url) => {
     return url;
 };
 
+utilities.slashSquash = (originalText) => {
+    if(originalText.includes('//')){
+        text = originalText.replace(/\/\//g, '\/');
+        return text;
+    }else return originalText;
+};
+
 /**
  * Testing utility functions
  * Does not include unit test

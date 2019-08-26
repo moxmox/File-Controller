@@ -67,7 +67,22 @@ $(document).ready(() => {
                 console.log('copyBtn clicked');
             });
             menu.upBtn.on('click', () => {
-                console.log('upBtn clicked');
+                if(app.cwd==='' || app.cwd==='/'){
+                    window.alert('Cannot move up.');
+                    return;
+                }
+                let dirList = app.cwd.split('/');
+                dirList.pop();
+                app.cwd = '/';
+                for(i=0;i<dirList.length - 1;i++){
+                    app.cwd += `${dirList[i]}/`;
+                    console.log(app.cwd);
+                }
+                app.cwd += dirList[dirList.length - 1];
+                app.cwd = utilities.slashSquash(app.cwd);
+                console.log(app.cwd);
+                display.clear();
+                app.openDir();
             });
             menu.deleteBtn.on('click', () => {
                 app.action = ACTION.DELETE;
@@ -201,6 +216,10 @@ $(document).ready(() => {
                 app.action = 'none';
                 app.actionItem = 'none';
             });
+        },
+
+        copyItem: () => {
+
         },
 
         moveItem: () => {
